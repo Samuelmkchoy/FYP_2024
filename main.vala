@@ -11,7 +11,7 @@ int main(string[] args) {
     window.set_default_size(350,70);
     window.border_width = 10;
     
-    window.add(new Gtk.Button.with_label("Hello, Elementary!"));
+    window.add(new Gtk.Button.with_label("Hello, This is Bridges Puzzle!"));
     window.show_all();
     
     Gtk.main();
