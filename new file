@@ -1,0 +1,85 @@
+class GameWindow : Gtk.Window {
+	// Number of row and columns
+	const int GRID_SIZE = 5;
+	
+	// Array of the grid
+	bool[][] grid;
+	
+	construct {
+		this.set_title("Bridges Puzzle Game - Play");
+		this.destroy.connect(Gtk.main_quit);
+		this.set_default_size(800,600);
+		
+		grid = new bool*[GRID_SIZE];
+		for (int i = 0; i < GRID_SIZE; i++) {
+			grid[i] = new bool[GRID_SIZE];
+			for (int j = 0; j < GRID_SIZE; j++){
+				grid[i][j] = false;
+			}
+		}
+	
+		this.draw.connect(on_draw);
+	
+		this.button_press_event.connect(on_button_press);
+	}
+	
+	bool on_draw(Cairo.Context cr) {
+		for (int i = 0; i < GRID_SIZE; i++) {
+			for (int j = 0; j < GRID_SIZE; j++) {
+				drawIsland(cr, i, j);
+				drawBridge(cr, i, j);
+			}
+		}
+
+		return false;
+	}
+	
+	bool on_button_press(Gdk.EventButton event){
+		int col = int(event.x / (this.allocation.width / GRID_SIZE));
+		int row = int(event.y / (this.allocation.width / GRID_SIZE));
+	
+		grid[row][col] = !grid[row][col];
+	
+		this.queue_draw();
+	
+		return false;
+	}
+	
+	void drawIsland(Cairo.Context cr, int row, int col) {
+		cr.arc(
+			col * this.allocation.width / GRID_SIZE + this.allocation.width / (2 * GRID_SIZE),
+			row * this.allocation.height / GRID_SIZE + this.allocation.height / (2 * GRID_SIZE),
+			this.allcation.width / (2 * GRID_SIZE),
+			0, 2 * Math.PI);
+		
+		cr.set_source_rgba(0, 0, 0, 1);
+		cr.fill_preserve();
+		cr.set_source_rgba(0, 0, 0, 0.5);
+		cr.stroke();
+	}
+	
+	void drawBridge(Cairo.Context cr, int row, int col) {
+		if (col + 1 < GRID_SIZE && grid[row][col] && grid[row][col + 1]) {
+			//horizontal bridge
+			cr.move_to((col +1) * this.allocation.width / GRID_SIZE,
+				row * this.allocation.height / GRID_SIZE + this.allocation.height / (2 * GRID_SIZE));
+			cr.line_to(col * this.allocation.width / GRID_SIZE + this.allocation.width / GRID_SIZE,
+				row * this.allocation.height / GRID_SIZE + this.allocation.height / (2 * GRID_SIZE));
+			cr.set_source_rgba(0, 0, 0, 1);
+			cr.set_line_width(3);
+			cr.stroke();
+		}
+		
+		if (row + 1 < GRID_SIZE && grid[row][col] && grid[row + 1][col]) {
+			//Vertical bridge
+			cr.move_to(col * this.allocation.width / GRID_SIZE + this.allocation.width / (2 * GRID_SIZE),
+				(row + 1) * this.allocation.height / GRID_SIZE);
+			cr.line_to(col * this.allocation.width / GRID_SIZE + this.allocation.width / (2 * GRID_SIZE),
+				row * this.allocation.height / GRID_SIZE + this.allocation.height / GRID_SIZE);
+			cr.set_source_rgba(0, 0, 0, 1);
+			cr.set_line_width(3);
+			cr.stroke();
+		}
+	}
+}
+
